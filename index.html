@@ -1,56 +1,73 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tablero Ejecutivo DGOR</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="./config.js"></script>
-  <style>
-    :root{--azul:#003366;--azul2:#0A4F8F;--verde:#00B050;--amarillo:#FFC000;--rojo:#C00000;--gris:#F3F6FA;--texto:#1F2933;--borde:#D0D7E2;--blanco:#fff;--teal:#00A6A6}
-    *{box-sizing:border-box} body{margin:0;font-family:Segoe UI,Aptos,Arial,sans-serif;background:var(--gris);color:var(--texto)}
-    header{background:var(--azul);color:#fff;padding:18px 28px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
-    .topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap} h1{margin:0;font-size:26px}.sub{font-size:13px;color:#d9eaf7;margin-top:4px}
-    .reload{background:white;color:var(--azul);padding:10px 16px;border-radius:14px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.18);border:0}.reload:disabled{opacity:.65;cursor:not-allowed}
-    .layout{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 78px)} aside{background:#00264D;color:white;padding:18px 14px} aside .brand{font-weight:800;text-align:center;margin-bottom:18px;padding:10px;border:1px solid rgba(255,255,255,.22);border-radius:14px}
-    aside button{width:100%;background:transparent;color:white;border:0;text-align:left;padding:12px 14px;border-radius:12px;margin:4px 0;cursor:pointer;font-weight:650} aside button.active,aside button:hover{background:var(--azul2)}
-    main{padding:22px;overflow:auto}.panel{background:white;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:18px;margin-bottom:18px;border:1px solid var(--borde)}
-    .filters{display:grid;grid-template-columns:1.4fr repeat(3,minmax(180px,1fr));gap:12px;align-items:center} input,select{width:100%;padding:11px 12px;border:1px solid var(--borde);border-radius:12px;background:#FAFBFC;outline:none;font-size:14px}.file-info{font-size:13px;color:#667085;margin-top:10px}
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.kpi{background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);border:1px solid var(--borde)}.kpi .label{padding:9px 14px;color:white;font-weight:800;font-size:13px}.kpi .value{font-size:30px;font-weight:800;padding:18px 14px;background:white}
-    .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--azul);font-weight:800;font-size:18px} canvas{max-height:360px}.accordion{display:flex;flex-direction:column;gap:10px}
-    .folio{border:1px solid var(--borde);border-radius:15px;overflow:hidden;background:#fbfcfe}.folio-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;cursor:pointer;background:#F8FAFC}.folio-title{font-weight:800;color:var(--azul)}.folio-meta{font-size:12px;color:#667085;margin-top:3px}.badge{display:inline-block;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;color:white;white-space:nowrap}.folio-body{display:none;padding:14px;background:white;border-top:1px solid var(--borde)}.folio.open .folio-body{display:block}.activity{border:1px solid var(--borde);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}.activity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:13px}.obs{margin-top:10px;background:#F3F6FA;border-radius:10px;padding:10px;font-size:13px}
-    table{width:100%;border-collapse:collapse;font-size:13px;background:white} th{background:var(--azul);color:white;text-align:left;padding:10px;position:sticky;top:0}td{padding:9px 10px;border-bottom:1px solid var(--borde);vertical-align:top}.heatmap td.num{text-align:center;font-weight:700;color:#111827}.note{background:#EAF2F8;border-left:5px solid var(--azul2);padding:12px;border-radius:12px;font-size:13px;line-height:1.45}.hidden{display:none!important}
-    @media(max-width:1050px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto;gap:8px}aside .brand{display:none}aside button{white-space:nowrap;width:auto}.filters,.kpis{grid-template-columns:1fr}.activity-grid{grid-template-columns:1fr}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tablero Ejecutivo DGOR</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="./config.js"></script>
+<style>
+:root{--azul:#003366;--azul2:#0A4F8F;--verde:#00B050;--amarillo:#FFC000;--rojo:#C00000;--gris:#F3F6FA;--texto:#1F2933;--borde:#D0D7E2;--blanco:#fff;--teal:#00A6A6}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Aptos,Arial,sans-serif;background:var(--gris);color:var(--texto)}
+header{background:var(--azul);color:#fff;padding:18px 28px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}h1{margin:0;font-size:26px}.sub{font-size:13px;color:#d9eaf7;margin-top:4px}
+.reload{background:#fff;color:var(--azul);padding:10px 16px;border-radius:14px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.18);border:0}.reload:disabled{opacity:.65;cursor:not-allowed}
+.layout{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 78px)}aside{background:#00264D;color:#fff;padding:18px 14px}aside .brand{font-weight:800;text-align:center;margin-bottom:18px;padding:10px;border:1px solid rgba(255,255,255,.22);border-radius:14px}
+aside button{width:100%;background:transparent;color:#fff;border:0;text-align:left;padding:12px 14px;border-radius:12px;margin:4px 0;cursor:pointer;font-weight:650}aside button.active,aside button:hover{background:var(--azul2)}
+main{padding:22px;overflow:auto}.panel{background:#fff;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:18px;margin-bottom:18px;border:1px solid var(--borde)}
+.filters{display:grid;grid-template-columns:1.4fr repeat(3,minmax(180px,1fr));gap:12px;align-items:center}input,select{width:100%;padding:11px 12px;border:1px solid var(--borde);border-radius:12px;background:#FAFBFC;outline:none;font-size:14px}.file-info{font-size:13px;color:#667085;margin-top:10px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.kpi{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);border:1px solid var(--borde)}.kpi .label{padding:9px 14px;color:#fff;font-weight:800;font-size:13px}.kpi .value{font-size:30px;font-weight:800;padding:18px 14px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--azul);font-weight:800;font-size:18px}.accordion{display:flex;flex-direction:column;gap:10px}
+.folio{border:1px solid var(--borde);border-radius:15px;overflow:hidden;background:#fbfcfe}.folio-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;cursor:pointer;background:#F8FAFC}.folio-title{font-weight:800;color:var(--azul)}.folio-meta{font-size:12px;color:#667085;margin-top:3px}.badge{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;color:#fff;white-space:nowrap}.folio-body{display:none;padding:14px;background:#fff;border-top:1px solid var(--borde)}.folio.open .folio-body{display:block}
+.activity{border:1px solid var(--borde);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}.activity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:13px}.obs{margin-top:10px;background:#F3F6FA;border-radius:10px;padding:10px;font-size:13px;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}th{background:var(--azul);color:#fff;text-align:left;padding:10px;position:sticky;top:0}td{padding:9px 10px;border-bottom:1px solid var(--borde);vertical-align:top}.heatmap td.num{text-align:center;font-weight:700}.note{background:#EAF2F8;border-left:5px solid var(--azul2);padding:12px;border-radius:12px;font-size:13px;line-height:1.45}.hidden{display:none!important}
+.chart-bars{display:flex;flex-direction:column;gap:12px}.chart-row{display:grid;grid-template-columns:180px 1fr;gap:10px;align-items:center;font-size:12px}.bar{height:24px;display:flex;border:1px solid #e5e7eb}.seg{height:100%;min-width:0}.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:12px}.dot{width:12px;height:12px;display:inline-block;margin-right:5px}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto;gap:8px}aside .brand{display:none}aside button{white-space:nowrap;width:auto}.filters,.kpis{grid-template-columns:1fr}.activity-grid{grid-template-columns:1fr}.chart-row{grid-template-columns:120px 1fr}}
+</style>
 </head>
 <body>
-<header><div class="topbar"><div><h1>Tablero Ejecutivo DGOR</h1><div class="sub">Datos automáticos desde almacenamiento externo · Actividades por folio · Situación · Estado × Estatus</div></div><button class="reload" id="reloadButton" type="button">↻ Actualizar datos</button></div></header>
-<div class="layout"><aside><div class="brand">DGOR · Dashboard</div><button class="nav active" data-view="inicio">Inicio</button><button class="nav" data-view="folio">Actividades por folio</button><button class="nav" data-view="situacion">Situación</button><button class="nav" data-view="detalle">Detalle</button><button class="nav" data-view="ayuda">Actualización diaria</button></aside>
+<header><div class="topbar"><div><h1>Tablero Ejecutivo DGOR</h1><div class="sub">Excel automático desde el repositorio · Actividades por folio · Estatus y Seguimiento · Situación</div></div><button class="reload" id="reloadButton" type="button">↻ Actualizar datos</button></div></header>
+<div class="layout">
+<aside><div class="brand">DGOR · Dashboard</div>
+<button class="nav active" data-view="inicio">Inicio</button>
+<button class="nav" data-view="folio">Actividades por folio</button>
+<button class="nav" data-view="estatus">Estatus y Seguimiento</button>
+<button class="nav" data-view="situacion">Situación</button>
+<button class="nav" data-view="detalle">Detalle</button>
+<button class="nav" data-view="ayuda">Actualización diaria</button>
+</aside>
 <main>
-<section class="panel"><div class="filters"><input id="search" placeholder="Buscar folio, estado, responsable o acceso..." /><select id="estatusFilter"><option>Todos</option></select><select id="situacionFilter"><option>Todos</option></select><select id="estadoFilter"><option>Todos</option></select></div><div class="file-info" id="fileInfo">Cargando el Excel actualizado...</div></section>
-<section id="view-inicio"><div class="kpis" id="kpis"></div><div class="panel"><div class="section-title">Estado × Estatus</div><canvas id="estadoChart"></canvas></div><div class="panel"><div class="section-title">Mapa de calor Estado × Estatus</div><div id="heatmap"></div></div><div class="panel"><div class="section-title">Distribución por situación</div><canvas id="situacionChart"></canvas></div></section>
+<section class="panel"><div class="filters"><input id="search" placeholder="Buscar folio, estado, responsable o acceso..."><select id="estatusFilter"><option>Todos</option></select><select id="situacionFilter"><option>Todos</option></select><select id="estadoFilter"><option>Todos</option></select></div><div class="file-info" id="fileInfo">Cargando el Excel desde el repositorio...</div></section>
+<section id="view-inicio"><div class="kpis" id="kpis"></div><div class="panel"><div class="section-title">Estado × Estatus</div><div id="estadoChart"></div></div><div class="panel"><div class="section-title">Mapa de calor Estado × Estatus</div><div id="heatmap"></div></div><div class="panel"><div class="section-title">Distribución por situación</div><div id="situacionChart"></div></div></section>
 <section id="view-folio" class="hidden"><div class="panel"><div class="section-title">Actividades realizadas por cada folio <span style="font-size:12px;color:#667085">Use el signo + para desplegar</span></div><div id="accordion" class="accordion"></div></div></section>
+<section id="view-estatus" class="hidden"><div class="panel"><div class="section-title">Estatus y Seguimiento por folio <span style="font-size:12px;color:#667085">Use el signo + para desplegar</span></div><div id="estatusAccordion" class="accordion"></div></div></section>
 <section id="view-situacion" class="hidden"><div class="panel"><div class="section-title">Resumen de situación</div><div id="situacionTable"></div></div></section>
 <section id="view-detalle" class="hidden"><div class="panel"><div class="section-title">Detalle filtrado</div><div id="detailTable"></div></div></section>
-<section id="view-ayuda" class="hidden"><div class="panel"><div class="section-title">Actualización automática</div><div class="note"><strong>Funcionamiento:</strong><br>1. El dashboard obtiene el Excel desde la URL configurada en <strong>config.js</strong>.<br>2. Reemplace el archivo en el almacenamiento externo conservando el mismo nombre o URL.<br>3. Recargue la página o use el botón <strong>Actualizar datos</strong>.<br><br><strong>Hojas esperadas:</strong> Actividades, Estatus o Accesos.</div></div></section>
+<section id="view-ayuda" class="hidden"><div class="panel"><div class="section-title">Actualización del Excel</div><div class="note"><strong>Funcionamiento:</strong><br>1. El dashboard carga automáticamente <strong>data/detalleConcertacion.xlsx</strong> desde el repositorio.<br>2. Para actualizar la información, reemplace ese archivo conservando el mismo nombre y ruta.<br>3. Recargue la página o use el botón <strong>Actualizar datos</strong>.<br><br><strong>Hojas utilizadas:</strong> Actividades y Estatus. Si no existe Actividades, se utiliza la primera hoja.</div></div></section>
 </main></div>
 <script>
-let allRows=[],estadoChart,situacionChart;const colors={'NO ASIGNADO':'#C00000','ASIGNADO':'#FFC000','CONCRETADO':'#00B050','EN PROCESO':'#0A4F8F','SIN ESTATUS':'#94A3B8'};
-function keyVal(o,a){const k=Object.keys(o||{});for(const x of a){const m=k.find(y=>String(y).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(x));if(m)return o[m]}return''}
-function normalizeRows(rows){return rows.map(r=>({UE:String(keyVal(r,['ue','direccion regional'])||'').trim(),CE:String(keyVal(r,['ce','estado','coordinacion'])||'').trim(),Folio:String(keyVal(r,['folio'])||'').trim(),Clave:String(keyVal(r,['clave','cve'])||'').trim(),Estatus:String(keyVal(r,['estatus'])||'SIN ESTATUS').trim().toUpperCase(),Nombre:String(keyVal(r,['nombre del acceso','nombre'])||'').trim(),Responsable:String(keyVal(r,['empleado asignado','responsable'])||'').trim(),Actividad:String(keyVal(r,['actividad'])||'SIN REGISTRO').trim(),Situacion:String(keyVal(r,['situacion'])||'SIN SITUACION').trim(),Detalle:String(keyVal(r,['detalle'])||'').trim(),Observaciones:String(keyVal(r,['observaciones'])||'').trim(),Fecha:String(keyVal(r,['fecha actividad','fecha'])||'').trim()})).filter(r=>r.Folio||r.Nombre||r.Estatus)}
-function uniq(a){return[...new Set(a.filter(Boolean))].sort()}function setOptions(id,v){const e=document.getElementById(id),cur=e.value;e.innerHTML='<option>Todos</option>'+v.map(x=>`<option>${x}</option>`).join('');if(v.includes(cur))e.value=cur}
-function filteredRows(){const q=document.getElementById('search').value.toLowerCase(),est=document.getElementById('estatusFilter').value,sit=document.getElementById('situacionFilter').value,edo=document.getElementById('estadoFilter').value;return allRows.filter(r=>(!q||[r.Folio,r.Nombre,r.CE,r.UE,r.Responsable].join(' ').toLowerCase().includes(q))&&(est==='Todos'||r.Estatus===est)&&(sit==='Todos'||r.Situacion===sit)&&(edo==='Todos'||r.CE===edo))}
-function groupBy(a,k){return a.reduce((m,r)=>{const x=r[k]||'SIN DATO';(m[x]=m[x]||[]).push(r);return m},{})}function render(){setOptions('estatusFilter',uniq(allRows.map(r=>r.Estatus)));setOptions('situacionFilter',uniq(allRows.map(r=>r.Situacion)));setOptions('estadoFilter',uniq(allRows.map(r=>r.CE)));const r=filteredRows();renderKPIs(r);renderCharts(r);renderHeatmap(r);renderAccordion(r);renderSituacionTable(r);renderDetailTable(r)}
-function renderKPIs(r){const f=uniq(r.map(x=>x.Folio)),situ=r.filter(x=>x.Situacion&&x.Situacion!=='SIN SITUACION').length,noa=r.filter(x=>x.Estatus==='NO ASIGNADO').length;document.getElementById('kpis').innerHTML=[['Registros',r.length,'#0A4F8F'],['Folios',f.length,'#003366'],['Con situación',situ,'#00A6A6'],['No asignados',noa,'#C00000']].map(k=>`<div class="kpi"><div class="label" style="background:${k[2]}">${k[0]}</div><div class="value">${k[1]}</div></div>`).join('')}
-function estadoData(r){const m={};r.forEach(x=>{const k=x.CE||'SIN ESTADO';m[k]=m[k]||{estado:k,noAsignado:0,asignado:0,concretado:0};if(x.Estatus==='NO ASIGNADO')m[k].noAsignado++;if(x.Estatus==='ASIGNADO')m[k].asignado++;if(x.Estatus==='CONCRETADO')m[k].concretado++});return Object.values(m)}
-function renderCharts(r){const ed=estadoData(r),labels=ed.map(x=>x.estado);if(estadoChart)estadoChart.destroy();estadoChart=new Chart(document.getElementById('estadoChart'),{type:'bar',data:{labels,datasets:[{label:'No asignado',data:ed.map(x=>x.noAsignado),backgroundColor:'#C00000'},{label:'Asignado',data:ed.map(x=>x.asignado),backgroundColor:'#FFC000'},{label:'Concretado',data:ed.map(x=>x.concretado),backgroundColor:'#00B050'}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true},y:{stacked:true}}}});const sm={};r.forEach(x=>sm[x.Situacion||'SIN SITUACION']=(sm[x.Situacion||'SIN SITUACION']||0)+1);if(situacionChart)situacionChart.destroy();situacionChart=new Chart(document.getElementById('situacionChart'),{type:'doughnut',data:{labels:Object.keys(sm),datasets:[{data:Object.values(sm),backgroundColor:['#003366','#00A6A6','#FFC000','#C00000','#0A4F8F','#94A3B8']}]},options:{plugins:{legend:{position:'bottom'}}}})}
-function renderHeatmap(r){const edos=uniq(r.map(x=>x.CE)),sts=uniq(r.map(x=>x.Estatus)),max=Math.max(1,...edos.flatMap(e=>sts.map(s=>r.filter(x=>x.CE===e&&x.Estatus===s).length)));let html='<table class="heatmap"><thead><tr><th>Estado / CE</th>'+sts.map(s=>`<th>${s}</th>`).join('')+'</tr></thead><tbody>';edos.forEach(e=>{html+=`<tr><td>${e}</td>`;sts.forEach(s=>{const v=r.filter(x=>x.CE===e&&x.Estatus===s).length,bg=`rgba(192,0,0,${0.08+(v/max)*0.75})`;html+=`<td class="num" style="background:${bg}">${v}</td>`});html+='</tr>'});document.getElementById('heatmap').innerHTML=html+'</tbody></table>'}
-function renderAccordion(r){const m=groupBy(r,'Folio');document.getElementById('accordion').innerHTML=Object.entries(m).map(([folio,it])=>{const f=it[0],badge=colors[f.Estatus]||'#64748B',body=it.map(i=>`<div class="activity"><div class="activity-grid"><div><b>Actividad:</b> ${i.Actividad}</div><div><b>Situación:</b> ${i.Situacion}</div><div><b>Responsable:</b> ${i.Responsable||'Sin responsable'}</div></div><div class="obs"><b>Detalle:</b> ${i.Detalle||'Sin detalle'}</div>${i.Observaciones?`<div class="obs"><b>Observaciones:</b> ${i.Observaciones}</div>`:''}</div>`).join('');return `<div class="folio"><div class="folio-head" onclick="this.parentNode.classList.toggle('open')"><div><div class="folio-title">+ Folio ${folio||'SIN FOLIO'} · ${f.Nombre}</div><div class="folio-meta">${f.CE} · ${it.length} actividad(es)</div></div><span class="badge" style="background:${badge}">${f.Estatus}</span></div><div class="folio-body">${body}</div></div>`}).join('')||'<div class="note">Sin registros para mostrar.</div>'}
-function renderSituacionTable(r){const sm={};r.forEach(x=>sm[x.Situacion||'SIN SITUACION']=(sm[x.Situacion||'SIN SITUACION']||0)+1);document.getElementById('situacionTable').innerHTML='<table><thead><tr><th>Situación</th><th>Total</th></tr></thead><tbody>'+Object.entries(sm).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')+'</tbody></table>'}
-function renderDetailTable(r){document.getElementById('detailTable').innerHTML='<table><thead><tr><th>Folio</th><th>Estado/CE</th><th>Nombre</th><th>Estatus</th><th>Responsable</th><th>Actividad</th><th>Situación</th></tr></thead><tbody>'+r.map(x=>`<tr><td>${x.Folio}</td><td>${x.CE}</td><td>${x.Nombre}</td><td>${x.Estatus}</td><td>${x.Responsable}</td><td>${x.Actividad}</td><td>${x.Situacion}</td></tr>`).join('')+'</tbody></table>'}
+let allRows=[],estatusRows=[];const colors={'NO ASIGNADO':'#C00000','ASIGNADO':'#FFC000','CONCRETADO':'#00B050','EN PROCESO':'#0A4F8F','SIN ESTATUS':'#94A3B8'};
+function strip(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+function keyVal(o,aliases){const keys=Object.keys(o||{});for(const a of aliases){const m=keys.find(k=>strip(k).includes(a));if(m)return o[m]}return''}
+function normalizeRows(rows,isStatus=false){return rows.map(r=>({UE:String(keyVal(r,['ue','direccion regional'])||'').trim(),CE:String(keyVal(r,['ce','estado','coordinacion'])||'').trim(),Folio:String(keyVal(r,['folio'])||'').trim(),Clave:String(keyVal(r,['clave','cve'])||'').trim(),Estatus:String(keyVal(r,['estatus'])||'SIN ESTATUS').trim().toUpperCase(),Nombre:String(keyVal(r,['nombre del acceso','nombre'])||'').trim(),Responsable:String(keyVal(r,['empleado asignado','responsable'])||'').trim(),Actividad:String(keyVal(r,['actividad'])||'SIN REGISTRO').trim(),Situacion:String(keyVal(r,['situacion'])||'SIN SITUACION').trim(),Detalle:String(keyVal(r,['detalle de la situacion','detalle'])||'').trim(),Observaciones:String(keyVal(r,['observaciones de la accion'])||'').trim(),Fecha:String(keyVal(r,['fecha actividad','fecha'])||'').trim(),Motivo:String(keyVal(r,['motivo del estatus','motivo'])||'').trim(),ObsEstatus:String(keyVal(r,['observaciones del estatus','observaciones'])||'').trim()})).filter(r=>r.Folio||r.Nombre||r.Estatus)}
+function uniq(a){return[...new Set(a.filter(Boolean))].sort()} function setOptions(id,v){const e=document.getElementById(id),cur=e.value;e.innerHTML='<option>Todos</option>'+v.map(x=>`<option>${esc(x)}</option>`).join('');if(v.includes(cur))e.value=cur}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function groupBy(a,k){return a.reduce((m,r)=>{const x=r[k]||'SIN DATO';(m[x]=m[x]||[]).push(r);return m},{})}
+function filtered(source=allRows){const q=strip(document.getElementById('search').value),est=document.getElementById('estatusFilter').value,sit=document.getElementById('situacionFilter').value,edo=document.getElementById('estadoFilter').value;return source.filter(r=>(!q||strip([r.Folio,r.Nombre,r.CE,r.UE,r.Responsable].join(' ')).includes(q))&&(est==='Todos'||r.Estatus===est)&&(sit==='Todos'||r.Situacion===sit)&&(edo==='Todos'||r.CE===edo))}
+function render(){const union=[...allRows,...estatusRows];setOptions('estatusFilter',uniq(union.map(r=>r.Estatus)));setOptions('situacionFilter',uniq(allRows.map(r=>r.Situacion)));setOptions('estadoFilter',uniq(union.map(r=>r.CE)));const r=filtered(allRows),er=filtered(estatusRows);renderKPIs(r,er);renderEstado(r);renderHeatmap(r);renderSituacion(r);renderAccordion(r);renderEstatusAccordion(er);renderSituacionTable(r);renderDetail(r)}
+function renderKPIs(r,er){document.getElementById('kpis').innerHTML=[['Registros',r.length,'#0A4F8F'],['Folios',uniq(r.map(x=>x.Folio)).length,'#003366'],['Seguimientos',er.length,'#00A6A6'],['No asignados',er.filter(x=>x.Estatus==='NO ASIGNADO').length,'#C00000']].map(k=>`<div class="kpi"><div class="label" style="background:${k[2]}">${k[0]}</div><div class="value">${k[1]}</div></div>`).join('')}
+function estadoData(r){const m={};r.forEach(x=>{const k=x.CE||'SIN ESTADO';m[k]=m[k]||{estado:k,no:0,asi:0,con:0};if(x.Estatus==='NO ASIGNADO')m[k].no++;if(x.Estatus==='ASIGNADO')m[k].asi++;if(x.Estatus==='CONCRETADO')m[k].con++});return Object.values(m)}
+function renderEstado(r){const d=estadoData(r),max=Math.max(1,...d.map(x=>x.no+x.asi+x.con));document.getElementById('estadoChart').innerHTML='<div class="chart-bars">'+d.map(x=>`<div class="chart-row"><div>${esc(x.estado)}</div><div class="bar"><div class="seg" style="width:${x.no/max*100}%;background:#C00000"></div><div class="seg" style="width:${x.asi/max*100}%;background:#FFC000"></div><div class="seg" style="width:${x.con/max*100}%;background:#00B050"></div></div></div>`).join('')+'</div><div class="legend"><span><i class="dot" style="background:#C00000"></i>No asignado</span><span><i class="dot" style="background:#FFC000"></i>Asignado</span><span><i class="dot" style="background:#00B050"></i>Concretado</span></div>'}
+function renderHeatmap(r){const edos=uniq(r.map(x=>x.CE)),sts=uniq(r.map(x=>x.Estatus)),max=Math.max(1,...edos.flatMap(e=>sts.map(s=>r.filter(x=>x.CE===e&&x.Estatus===s).length)));let h='<table class="heatmap"><thead><tr><th>Estado / CE</th>'+sts.map(s=>`<th>${esc(s)}</th>`).join('')+'</tr></thead><tbody>';edos.forEach(e=>{h+=`<tr><td>${esc(e)}</td>`;sts.forEach(s=>{const v=r.filter(x=>x.CE===e&&x.Estatus===s).length;h+=`<td class="num" style="background:rgba(192,0,0,${.08+v/max*.75})">${v}</td>`});h+='</tr>'});document.getElementById('heatmap').innerHTML=h+'</tbody></table>'}
+function renderSituacion(r){const sm={};r.forEach(x=>sm[x.Situacion||'SIN SITUACION']=(sm[x.Situacion||'SIN SITUACION']||0)+1);const max=Math.max(1,...Object.values(sm));document.getElementById('situacionChart').innerHTML='<div class="chart-bars">'+Object.entries(sm).map(([k,v])=>`<div class="chart-row"><div>${esc(k)}</div><div class="bar"><div class="seg" style="width:${v/max*100}%;background:#003366"></div></div></div>`).join('')+'</div>'}
+function renderAccordion(r){document.getElementById('accordion').innerHTML=Object.entries(groupBy(r,'Folio')).map(([folio,it])=>{const f=it[0],body=it.map(i=>`<div class="activity"><div class="activity-grid"><div><b>Actividad:</b> ${esc(i.Actividad)}</div><div><b>Situación:</b> ${esc(i.Situacion)}</div><div><b>Responsable:</b> ${esc(i.Responsable||'Sin responsable')}</div></div><div class="obs"><b>Detalle:</b> ${esc(i.Detalle||'Sin detalle')}</div>${i.Observaciones?`<div class="obs"><b>Observaciones:</b> ${esc(i.Observaciones)}</div>`:''}</div>`).join('');return card(folio,f,it.length+' actividad(es)',body)}).join('')||'<div class="note">Sin registros.</div>'}
+function renderEstatusAccordion(r){document.getElementById('estatusAccordion').innerHTML=Object.entries(groupBy(r,'Folio')).map(([folio,it])=>{const f=it[0],body=it.map(i=>`<div class="activity"><div class="activity-grid"><div><b>Estatus:</b> ${esc(i.Estatus)}</div><div><b>Empleado asignado:</b> ${esc(i.Responsable||'Sin empleado asignado')}</div><div><b>Fecha:</b> ${esc(i.Fecha||'Sin fecha')}</div></div><div class="obs"><b>Motivo del estatus:</b><br>${esc(i.Motivo||'Sin motivo registrado')}</div><div class="obs"><b>Observaciones:</b><br>${esc(i.ObsEstatus||'Sin observaciones')}</div></div>`).join('');return card(folio,f,it.length+' seguimiento(s)',body)}).join('')||'<div class="note">Sin registros de estatus.</div>'}
+function card(folio,f,meta,body){return `<div class="folio"><div class="folio-head" onclick="this.parentNode.classList.toggle('open')"><div><div class="folio-title">+ Folio ${esc(folio)} · ${esc(f.Nombre)}</div><div class="folio-meta">${esc(f.CE)} · ${esc(meta)}</div></div><span class="badge" style="background:${colors[f.Estatus]||'#64748B'}">${esc(f.Estatus)}</span></div><div class="folio-body">${body}</div></div>`}
+function renderSituacionTable(r){const sm={};r.forEach(x=>sm[x.Situacion||'SIN SITUACION']=(sm[x.Situacion||'SIN SITUACION']||0)+1);document.getElementById('situacionTable').innerHTML='<table><thead><tr><th>Situación</th><th>Total</th></tr></thead><tbody>'+Object.entries(sm).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')+'</tbody></table>'}
+function renderDetail(r){document.getElementById('detailTable').innerHTML='<table><thead><tr><th>Folio</th><th>Estado/CE</th><th>Nombre</th><th>Estatus</th><th>Responsable</th><th>Actividad</th><th>Situación</th></tr></thead><tbody>'+r.map(x=>`<tr><td>${esc(x.Folio)}</td><td>${esc(x.CE)}</td><td>${esc(x.Nombre)}</td><td>${esc(x.Estatus)}</td><td>${esc(x.Responsable)}</td><td>${esc(x.Actividad)}</td><td>${esc(x.Situacion)}</td></tr>`).join('')+'</tbody></table>'}
+function parseCSV(text){const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return[];function split(line){let out=[],cur='',q=false;for(let i=0;i<line.length;i++){let ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(ch===','&&!q){out.push(cur);cur=''}else cur+=ch}out.push(cur);return out}const hs=split(lines[0]).map(x=>x.trim());return lines.slice(1).map(l=>{const v=split(l),o={};hs.forEach((h,i)=>o[h]=v[i]||'');return o})}
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('main>section[id^="view-"]').forEach(s=>s.classList.add('hidden'));document.getElementById('view-'+b.dataset.view).classList.remove('hidden')});
-async function loadExcelFromExternalStorage(){
+async function loadExcelFromRepository(){
   const fileInfo=document.getElementById('fileInfo');
   const reloadButton=document.getElementById('reloadButton');
 
@@ -61,73 +78,66 @@ async function loadExcelFromExternalStorage(){
 
     reloadButton.disabled=true;
     reloadButton.textContent='↻ Actualizando...';
-    fileInfo.textContent='Cargando el Excel actualizado...';
+    fileInfo.textContent='Cargando el Excel desde el repositorio...';
 
-    const configuredUrl=window.DASHBOARD_CONFIG.excelUrl;
-    const separator=configuredUrl.includes('?')?'&':'?';
-    const response=await fetch(configuredUrl+separator+'_='+Date.now(),{cache:'no-store'});
+    const url=window.DASHBOARD_CONFIG.excelUrl;
+    const separator=url.includes('?')?'&':'?';
+    const response=await fetch(url+separator+'_='+Date.now(),{cache:'no-store'});
 
     if(!response.ok){
       throw new Error(`Error HTTP ${response.status}`);
     }
 
-    const contentType=(response.headers.get('content-type')||'').toLowerCase();
-    if(contentType.includes('text/html')){
-      throw new Error('La URL devolvió una página HTML en lugar del archivo Excel');
-    }
-
     const buffer=await response.arrayBuffer();
-
-    if(buffer.byteLength<4){
-      throw new Error('El archivo descargado está vacío');
-    }
-
     const signature=new Uint8Array(buffer.slice(0,2));
+
     if(signature[0]!==0x50||signature[1]!==0x4B){
-      throw new Error('La URL no devolvió un archivo XLSX válido');
+      throw new Error('El archivo descargado no es un XLSX válido');
     }
 
-    const workbook=XLSX.read(buffer,{type:'array'});
-    const preferred=['Actividades','Estatus','Accesos',workbook.SheetNames[0]];
-    const sheet=preferred.find(name=>workbook.SheetNames.includes(name))||workbook.SheetNames[0];
+    const wb=XLSX.read(buffer,{type:'array'});
+    let act=[],est=[];
 
-    if(!sheet){
-      throw new Error('El archivo no contiene hojas');
+    if(wb.Sheets.Actividades){
+      act=normalizeRows(XLSX.utils.sheet_to_json(wb.Sheets.Actividades,{defval:''}));
     }
 
-    const json=XLSX.utils.sheet_to_json(workbook.Sheets[sheet],{defval:''});
-    const normalized=normalizeRows(json);
+    if(wb.Sheets.Estatus){
+      est=normalizeRows(XLSX.utils.sheet_to_json(wb.Sheets.Estatus,{defval:''}),true);
+    }
 
-    if(!normalized.length){
+    if(!act.length&&wb.SheetNames.length){
+      const first=wb.SheetNames[0];
+      act=normalizeRows(XLSX.utils.sheet_to_json(wb.Sheets[first],{defval:''}));
+    }
+
+    if(!act.length&&!est.length){
       throw new Error('El Excel no contiene registros reconocibles');
     }
 
-    allRows=normalized;
-    fileInfo.textContent=`Excel actualizado · Hoja: ${sheet} · Registros: ${allRows.length} · ${new Date().toLocaleString('es-MX')}`;
+    allRows=act.length?act:est.slice();
+    estatusRows=est.length?est:allRows.map(x=>({...x,Motivo:'',ObsEstatus:''}));
+
+    fileInfo.textContent=`Excel actualizado · Hojas: ${wb.SheetNames.join(', ')} · Actividades: ${allRows.length} · Seguimientos: ${estatusRows.length} · ${new Date().toLocaleString('es-MX')}`;
     render();
-  }catch(error){
-    console.error(error);
+  }catch(err){
+    console.error(err);
     allRows=[];
+    estatusRows=[];
     render();
-    fileInfo.textContent=`No se pudo cargar el Excel: ${error.message}`;
+    fileInfo.textContent='No se pudo cargar el Excel: '+err.message;
   }finally{
     reloadButton.disabled=false;
     reloadButton.textContent='↻ Actualizar datos';
   }
 }
 
-document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  document.querySelectorAll('main>section[id^="view-"]').forEach(s=>s.classList.add('hidden'));
-  document.getElementById('view-'+b.dataset.view).classList.remove('hidden');
-});
-
 ['search','estatusFilter','situacionFilter','estadoFilter'].forEach(id=>
   document.getElementById(id).addEventListener('input',render)
 );
 
-document.getElementById('reloadButton').addEventListener('click',loadExcelFromExternalStorage);
-window.addEventListener('DOMContentLoaded',loadExcelFromExternalStorage);
+document.getElementById('reloadButton').addEventListener('click',loadExcelFromRepository);
+window.addEventListener('DOMContentLoaded',loadExcelFromRepository);
 </script>
-</body></html>
+</body>
+</html>
