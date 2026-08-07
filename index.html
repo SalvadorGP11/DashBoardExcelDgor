@@ -1,99 +1,935 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tablero Ejecutivo DGOR</title><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="./config.js"></script><style>
-:root{--az:#003366;--az2:#0a4f8f;--teal:#00a6a6;--red:#c00000;--green:#00b050;--yellow:#ffc000;--bg:#f3f6fa;--border:#d0d7e2}*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Aptos,Arial,sans-serif;background:var(--bg);color:#1f2933}header{background:var(--az);color:#fff;padding:18px 28px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}h1{margin:0;font-size:26px}.sub{font-size:13px;color:#d9eaf7}.reload{background:#fff;color:var(--az);padding:10px 16px;border-radius:14px;font-weight:700;cursor:pointer;border:0}.reload:disabled{opacity:.65;cursor:not-allowed}.layout{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 78px)}aside{background:#00264d;padding:18px 14px;color:#fff}.brand{text-align:center;font-weight:800;padding:10px;border:1px solid #ffffff44;border-radius:14px;margin-bottom:16px}.nav{display:block;width:100%;border:0;background:transparent;color:#fff;text-align:left;padding:12px 14px;border-radius:12px;margin:4px 0;font-weight:650;cursor:pointer}.nav:hover,.nav.active{background:var(--az2)}main{padding:22px}.panel{background:#fff;border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:18px;box-shadow:0 4px 16px #00000012}.filters{display:grid;grid-template-columns:1.4fr repeat(3,minmax(160px,1fr));gap:12px}.filters input,.filters select{padding:11px;border:1px solid var(--border);border-radius:12px;width:100%}.info{font-size:13px;color:#667085;margin-top:10px}.kpis{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:14px;margin-bottom:18px}.kpi{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;text-align:center;box-shadow:0 4px 16px #00000012}.kpi .label{min-height:38px;padding:9px 12px;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center}.kpi .value{min-height:72px;padding:16px 12px;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center}.title{font-size:18px;font-weight:800;color:var(--az);margin-bottom:12px}.charts{display:flex;flex-direction:column;gap:10px}.chart-row{display:grid;grid-template-columns:210px 1fr;gap:12px;align-items:center;font-size:12px}.bar{height:24px;display:flex;border:1px solid #e5e7eb;background:#f8fafc}.seg{height:100%}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-top:12px}.dot{display:inline-block;width:12px;height:12px;margin-right:5px}table{width:100%;border-collapse:collapse;font-size:13px}th{background:var(--az);color:#fff;padding:10px;text-align:left}td{padding:9px 10px;border-bottom:1px solid var(--border)}.num{text-align:center;font-weight:700}.accordion{display:flex;flex-direction:column;gap:10px}.folio{border:1px solid var(--border);border-radius:15px;overflow:hidden}.folio-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:#f8fafc;cursor:pointer}.folio-title{font-weight:800;color:var(--az)}.meta{font-size:12px;color:#667085;margin-top:3px}.badge{color:#fff;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}.folio-body{display:none;background:#fff;padding:14px;border-top:1px solid var(--border)}.folio.open .folio-body{display:block}.activity{border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}.activity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:13px}.obs{background:#f3f6fa;border-radius:10px;padding:10px;margin-top:10px;font-size:13px}.hidden{display:none!important}@media(max-width:1250px){.kpis{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto}.brand{display:none}.nav{white-space:nowrap;width:auto}.filters{grid-template-columns:1fr}.activity-grid{grid-template-columns:1fr}}@media(max-width:600px){.kpis{grid-template-columns:1fr}.chart-row{grid-template-columns:120px 1fr}}
-</style></head><body><header><div class="top"><div><h1>Muestra de recolección de insumos de la EIC 2025</h1><div class="sub"></div></div><button class="reload" id="reloadButton" type="button">↻ Actualizar datos</button></div></header><div class="layout"><aside><div class="brand">EIC2025 · Dashboard</div><button class="nav active" data-view="inicio">Inicio</button><button class="nav" data-view="folio">Actividades por folio</button><button class="nav" data-view="estatus">Estatus y Seguimiento</button><button class="nav" data-view="situacion">Situación</button><button class="nav" data-view="detalle">Detalle</button></aside><main><section class="panel"><div class="filters"><input id="search" placeholder="Buscar folio, estado, responsable o acceso..."><select id="estatusFilter"><option>Todos</option></select><select id="situacionFilter"><option>Todos</option></select><select id="estadoFilter"><option>Todos</option></select></div><div id="fileInfo" class="info">Cargando el Excel desde el repositorio...</div></section>
-<section id="view-inicio"><div class="kpis" id="kpis"><div class="kpi"><div class="label" style="background:#003366">Folios</div><div class="value" id="kpiFolios">0</div></div><div class="kpi"><div class="label" style="background:#00a6a6">Seguimientos</div><div class="value" id="kpiSeguimientos">0</div></div><div class="kpi"><div class="label" style="background:#c00000">No asignados</div><div class="value" id="kpiNoAsignados">0</div></div><div class="kpi"><div class="label" style="background:#00b050">Concretados</div><div class="value" id="kpiConcretados">0</div></div><div class="kpi"><div class="label" style="background:#ffc000;color:#1f2933">Asignados</div><div class="value" id="kpiAsignados">0</div></div><div class="kpi"><div class="label" style="background:#0a4f8f">En proceso</div><div class="value" id="kpiEnProceso">0</div></div></div><div class="panel"><div class="title">Estado × Estatus</div><div id="estadoChart"></div></div><div class="panel"><div class="title">Mapa de calor Estado × Estatus</div><div id="heatmap"></div></div><div class="panel"><div class="title">Distribución por situación</div><div id="situacionChart"></div></div></section>
-<section id="view-folio" class="hidden"><div class="panel"><div class="title">Actividades realizadas por cada folio</div><div id="accordion" class="accordion"></div></div></section><section id="view-estatus" class="hidden"><div class="panel"><div class="title">Estatus y Seguimiento por folio</div><div id="estatusAccordion" class="accordion"></div></div></section><section id="view-situacion" class="hidden"><div class="panel"><div class="title">Resumen de situación</div><div id="situacionTable"></div></div></section><section id="view-detalle" class="hidden"><div class="panel"><div class="title">Detalle filtrado</div><div id="detailTable"></div></div></section></main></div>
-<script>
-let allRows=[],estatusRows=[];const colors={'NO ASIGNADO':'#c00000','ASIGNADO':'#ffc000','CONCRETADO':'#00b050','EN PROCESO':'#0a4f8f'};const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));const strip=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');function keyVal(o,a){for(const x of a){const k=Object.keys(o||{}).find(y=>strip(y).includes(x));if(k)return o[k]}return''}function normalize(rows){return rows.map(r=>({UE:String(keyVal(r,['ue','direccion regional'])).trim(),CE:String(keyVal(r,['ce','estado','coordinacion'])).trim(),Folio:String(keyVal(r,['folio'])).trim(),Estatus:String(keyVal(r,['estatus'])||'SIN ESTATUS').trim().toUpperCase(),Nombre:String(keyVal(r,['nombre del acceso','nombre'])).trim(),Responsable:String(keyVal(r,['empleado asignado','responsable'])).trim(),Actividad:String(keyVal(r,['actividad'])||'SIN REGISTRO').trim(),Situacion:String(keyVal(r,['situacion'])||'SIN SITUACION').trim(),Detalle:String(keyVal(r,['detalle de la situacion','detalle'])).trim(),Observaciones:String(keyVal(r,['observaciones de la accion'])).trim(),Motivo:String(keyVal(r,['motivo del estatus','motivo'])).trim(),ObsEstatus:String(keyVal(r,['observaciones del estatus','observaciones'])).trim(),Fecha:String(keyVal(r,['fecha actividad','fecha'])).trim()})).filter(x=>x.Folio||x.Nombre)}const uniq=a=>[...new Set(a.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'es',{numeric:true}));function group(a,k){return a.reduce((m,x)=>((m[x[k]||'SIN DATO']??=[]).push(x),m),{})}function options(id,vals){const e=document.getElementById(id),cur=e.value;e.innerHTML='<option>Todos</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');if(vals.includes(cur))e.value=cur}function filtered(src){const q=strip(document.getElementById('search').value),e=document.getElementById('estatusFilter').value,s=document.getElementById('situacionFilter').value,c=document.getElementById('estadoFilter').value;return src.filter(x=>(!q||strip([x.Folio,x.Nombre,x.CE,x.UE,x.Responsable].join(' ')).includes(q))&&(e==='Todos'||x.Estatus===e)&&(s==='Todos'||x.Situacion===s)&&(c==='Todos'||x.CE===c))}function render(){options('estatusFilter',uniq([...allRows,...estatusRows].map(x=>x.Estatus)));options('situacionFilter',uniq(allRows.map(x=>x.Situacion)));options('estadoFilter',uniq([...allRows,...estatusRows].map(x=>x.CE)));const r=filtered(allRows),er=filtered(estatusRows);renderKpis(r,er);renderEstado(r);renderHeat(r);renderSituacion(r);renderAcc(r);renderStatus(er);renderTables(r)}function renderKpis(r,er){document.getElementById('kpiFolios').textContent=uniq(r.map(x=>x.Folio)).length;document.getElementById('kpiSeguimientos').textContent=er.length;document.getElementById('kpiNoAsignados').textContent=er.filter(x=>x.Estatus==='NO ASIGNADO').length;document.getElementById('kpiConcretados').textContent=er.filter(x=>x.Estatus==='CONCRETADO').length;document.getElementById('kpiAsignados').textContent=er.filter(x=>x.Estatus==='ASIGNADO').length;document.getElementById('kpiEnProceso').textContent=er.filter(x=>x.Estatus==='EN PROCESO').length}function estado(r){const m={};r.forEach(x=>{const k=x.CE||'SIN ESTADO';m[k]??={estado:k,no:0,asi:0,con:0,pro:0};if(x.Estatus==='NO ASIGNADO')m[k].no++;if(x.Estatus==='ASIGNADO')m[k].asi++;if(x.Estatus==='CONCRETADO')m[k].con++;if(x.Estatus==='EN PROCESO')m[k].pro++});return Object.values(m).sort((a,b)=>a.estado.localeCompare(b.estado,'es'))}function renderEstado(r){const d=estado(r),max=Math.max(1,...d.map(x=>x.no+x.asi+x.con+x.pro));document.getElementById('estadoChart').innerHTML='<div class="charts">'+d.map(x=>`<div class="chart-row"><div>${esc(x.estado)}
-<b>Total: ${x.no+x.asi+x.con+x.pro}</b>
-NA:${x.no} · A:${x.asi} · C:${x.con} · P:${x.pro}</div><div class="bar"><div class="seg" style="width:${x.no/max*100}%;background:#c00000"></div><div class="seg" style="width:${x.asi/max*100}%;background:#ffc000"></div><div class="seg" style="width:${x.con/max*100}%;background:#00b050"></div><div class="seg" style="width:${x.pro/max*100}%;background:#0a4f8f"></div></div></div>`).join('')+'</div><div class="legend"><span><i class="dot" style="background:#c00000"></i>No asignado<span><i class="dot" style="background:#ffc000"></i>Asignado</span><span><i class="dot" style="background:#00b050"></i>Concretado</span><span><i class="dot" style="background:#0a4f8f"></i>En proceso</span></div></span>'}function renderHeat(r){
-  const container=document.getElementById('heatmap');
-  const es=uniq(r.map(x=>x.CE));
-  const st=uniq(r.map(x=>x.Estatus));
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tablero Ejecutivo DGOR - INEGI</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="./config.js"></script>
+  <style>
+    :root {
+      /* Colores Institucionales INEGI */
+      --inegi-blue-dark: #00264D;
+      --inegi-blue: #003366;
+      --inegi-blue-light: #0A4F8F;
+      --inegi-gray-bg: #F4F6F9;
+      --inegi-gray-surface: #FFFFFF;
+      --inegi-gray-border: #D1D5DB;
+      --inegi-text-main: #1F2937;
+      --inegi-text-muted: #6B7280;
 
-  if(!es.length||!st.length){
-    container.innerHTML='<div class="info">Sin información para generar el mapa Estado × Estatus.</div>';
-    return;
-  }
-
-  const counts=es.flatMap(e=>st.map(s=>r.filter(x=>x.CE===e&&x.Estatus===s).length));
-  const max=Math.max(1,...counts);
-
-  container.innerHTML='<table><thead><tr><th>Estado / CE</th>'+
-    st.map(s=>`<th>${esc(s)}</th>`).join('')+
-    '</tr></thead><tbody>'+
-    es.map(e=>'<tr><td>'+esc(e)+'</td>'+
-      st.map(s=>{
-        const v=r.filter(x=>x.CE===e&&x.Estatus===s).length;
-        return `<td class="num" style="background:rgba(192,0,0,${.08+v/max*.75})">${v}</td>`;
-      }).join('')+
-    '</tr>').join('')+
-    '</tbody></table>';
-}function renderSituacion(r){const m={};r.forEach(x=>m[x.Situacion||'SIN SITUACION']=(m[x.Situacion||'SIN SITUACION']||0)+1);const d=Object.entries(m).sort((a,b)=>b[1]-a[1]),max=Math.max(1,...d.map(x=>x[1]));document.getElementById('situacionChart').innerHTML='<div class="charts">'+d.map(([k,v])=>`<div class="chart-row"><div>${esc(k)}
-<b>${v}</b></div><div class="bar"><div class="seg" style="width:${v/max*100}%;background:#003366"></div></div></div>`).join('')+'</div>'}function card(folio,f,meta,body){return `<div class="folio"><div class="folio-head" onclick="this.parentNode.classList.toggle('open')"><div><div class="folio-title">+ Folio ${esc(folio)} · ${esc(f.Nombre)}</div><div class="meta">${esc(f.CE)} · ${esc(meta)}</div></div><span class="badge" style="background:${colors[f.Estatus]||'#64748b'}">${esc(f.Estatus)}</div><div class="folio-body"></span>${body}</div></div>`}function renderAcc(r){document.getElementById('accordion').innerHTML=Object.entries(group(r,'Folio')).sort((a,b)=>a[0].localeCompare(b[0],'es',{numeric:true})).map(([f,it])=>card(f,it[0],it.length+' actividad(es)',it.map(x=>`<div class="activity"><div class="activity-grid"><div><b>Actividad:</b> ${esc(x.Actividad)}</div><div><b>Situación:</b> ${esc(x.Situacion)}</div><div><b>Responsable:</b> ${esc(x.Responsable||'Sin responsable')}</div></div><div class="obs"><b>Detalle:</b> ${esc(x.Detalle||'Sin detalle')}</div></div>`).join(''))).join('')}function renderStatus(r){document.getElementById('estatusAccordion').innerHTML=Object.entries(group(r,'Folio')).sort((a,b)=>a[0].localeCompare(b[0],'es',{numeric:true})).map(([f,it])=>card(f,it[0],it.length+' seguimiento(s)',it.map(x=>`<div class="activity"><div class="activity-grid"><div><b>Estatus:</b> ${esc(x.Estatus)}</div><div><b>Empleado asignado:</b> ${esc(x.Responsable||'Sin empleado')}</div><div><b>Fecha:</b> ${esc(x.Fecha||'Sin fecha')}</div></div><div class="obs"><b>Motivo:</b> ${esc(x.Motivo||'Sin motivo')}</div><div class="obs"><b>Observaciones:</b> ${esc(x.ObsEstatus||'Sin observaciones')}</div></div>`).join(''))).join('')}function renderTables(r){const m={};r.forEach(x=>m[x.Situacion||'SIN SITUACION']=(m[x.Situacion||'SIN SITUACION']||0)+1);document.getElementById('situacionTable').innerHTML='<table><thead><tr><th>Situación</th><th>Total</th></tr></thead><tbody>'+Object.entries(m).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')+'</tbody></table>';document.getElementById('detailTable').innerHTML='<table><thead><tr><th>Folio</th><th>Estado</th><th>Nombre</th><th>Estatus</th><th>Responsable</th></tr></thead><tbody>'+r.map(x=>`<tr><td>${esc(x.Folio)}</td><td>${esc(x.CE)}</td><td>${esc(x.Nombre)}</td><td>${esc(x.Estatus)}</td><td>${esc(x.Responsable)}</td></tr>`).join('')+'</tbody></table>'}document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('main>section[id^="view-"]').forEach(x=>x.classList.add('hidden'));document.getElementById('view-'+b.dataset.view).classList.remove('hidden')});async function loadExcelFromRepository(){
-  const fileInfo=document.getElementById('fileInfo');
-  const reloadButton=document.getElementById('reloadButton');
-
-  try{
-    if(!window.DASHBOARD_CONFIG||!window.DASHBOARD_CONFIG.excelUrl){
-      throw new Error('No se configuró excelUrl en config.js');
+      /* Colores de Estatus */
+      --st-nra: #6B7280;
+      --st-asignado: #D97706;
+      --st-concretado: #15803D;
+      --st-proceso: #1D4ED8;
+      --st-noasignado: #DC2626;
+      --st-noconcretado: #991B1B;
     }
 
-    reloadButton.disabled=true;
-    reloadButton.textContent='↻ Actualizando...';
-    fileInfo.textContent='Cargando el Excel desde el repositorio...';
-
-    const url=window.DASHBOARD_CONFIG.excelUrl;
-    const separator=url.includes('?')?'&':'?';
-    const response=await fetch(url+separator+'_='+Date.now(),{cache:'no-store'});
-
-    if(!response.ok){
-      throw new Error(`Error HTTP ${response.status}`);
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--inegi-gray-bg);
+      color: var(--inegi-text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
-    const buffer=await response.arrayBuffer();
-    const signature=new Uint8Array(buffer.slice(0,2));
-
-    if(signature[0]!==0x50||signature[1]!==0x4B){
-      throw new Error('El archivo descargado no es un XLSX válido');
+    /* Encabezado */
+    header {
+      background-color: var(--inegi-blue-dark);
+      color: #FFFFFF;
+      padding: 16px 32px;
+      border-bottom: 4px solid var(--inegi-blue-light);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
-    const wb=XLSX.read(buffer,{type:'array'});
-    const read=n=>wb.Sheets[n]?normalize(XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:''})):[];
-
-    allRows=read('Actividades');
-    estatusRows=read('Estatus');
-
-    if(!allRows.length&&wb.SheetNames.length){
-      allRows=read(wb.SheetNames[0]);
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
-    if(!estatusRows.length){
-      estatusRows=allRows.slice();
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
-    if(!allRows.length&&!estatusRows.length){
-      throw new Error('El Excel no contiene registros reconocibles');
+    /* Ajuste para la imagen del logo */
+    .brand-logo {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
     }
 
-    fileInfo.textContent=`Excel actualizado · Hojas: ${wb.SheetNames.join(', ')} · Actividades: ${allRows.length} · Seguimientos: ${estatusRows.length} · ${new Date().toLocaleString('es-MX')}`;
-    render();
-  }catch(err){
-    console.error(err);
-    allRows=[];
-    estatusRows=[];
-    render();
-    fileInfo.textContent='No se pudo cargar el Excel: '+err.message;
-  }finally{
-    reloadButton.disabled=false;
-    reloadButton.textContent='↻ Actualizar datos';
-  }
-}
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
 
-['search','estatusFilter','situacionFilter','estadoFilter'].forEach(id=>
-  document.getElementById(id).addEventListener('input',render)
-);
+    .sub-title {
+      font-size: 13px;
+      color: #D1D5DB;
+      margin-top: 2px;
+    }
 
-document.getElementById('reloadButton').addEventListener('click',loadExcelFromRepository);
-window.addEventListener('DOMContentLoaded',loadExcelFromRepository);
-</script></body></html>
+    .reload-btn {
+      background-color: #FFFFFF;
+      color: var(--inegi-blue);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid #FFFFFF;
+    }
+
+    .reload-btn:hover { background-color: #E5E7EB; }
+    .reload-btn:disabled { opacity: .65; cursor: not-allowed; }
+
+    /* Estructura */
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Navegación por pestañas */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--inegi-gray-border);
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .nav-tab {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--inegi-text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover { color: var(--inegi-blue); }
+
+    .nav-tab.active {
+      color: var(--inegi-blue);
+      border-bottom-color: var(--inegi-blue);
+      background: rgba(0, 51, 102, 0.04);
+      border-radius: 6px 6px 0 0;
+    }
+
+    /* Paneles y Tarjetas */
+    .panel {
+      background: var(--inegi-gray-surface);
+      border: 1px solid var(--inegi-gray-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Filtros */
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .filter-control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-control label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--inegi-text-muted);
+      text-transform: uppercase;
+    }
+
+    .filters-grid input, .filters-grid select {
+      padding: 10px 14px;
+      border: 1px solid var(--inegi-gray-border);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background-color: #fff;
+    }
+
+    .filters-grid input:focus, .filters-grid select:focus {
+      border-color: var(--inegi-blue);
+      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+    }
+
+    .file-info {
+      font-size: 13px;
+      color: var(--inegi-text-muted);
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    /* Dashboard KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--inegi-gray-border);
+      border-radius: 10px;
+      padding: 16px;
+      border-top: 5px solid var(--inegi-blue);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100px;
+    }
+
+    .kpi-card.kpi-total { border-top-color: var(--inegi-blue-dark); }
+    .kpi-card.kpi-nra { border-top-color: var(--st-nra); }
+    .kpi-card.kpi-asignado { border-top-color: var(--st-asignado); }
+    .kpi-card.kpi-concretado { border-top-color: var(--st-concretado); }
+    .kpi-card.kpi-proceso { border-top-color: var(--st-proceso); }
+    .kpi-card.kpi-noasignado { border-top-color: var(--st-noasignado); }
+    .kpi-card.kpi-noconcretado { border-top-color: var(--st-noconcretado); }
+
+    .kpi-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--inegi-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--inegi-text-main);
+      margin-top: 4px;
+      line-height: 1;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--inegi-blue-dark);
+      margin-bottom: 16px;
+      border-bottom: 1px solid #E5E7EB;
+      padding-bottom: 8px;
+    }
+
+    /* Gráficos */
+    .charts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 16px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .chart-label {
+      font-weight: 600;
+      color: var(--inegi-text-main);
+    }
+
+    .bar-container {
+      height: 28px;
+      display: flex;
+      background: #E5E7EB;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .bar-segment {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFF;
+      transition: width 0.3s ease;
+    }
+
+    /* Tablas y Centrado de Títulos */
+    .table-container { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--inegi-blue-dark);
+      color: #FFFFFF;
+      padding: 12px;
+      font-weight: 600;
+      text-align: center; /* Titulos de tablas centrados */
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--inegi-gray-border);
+    }
+
+    tr:nth-child(even) { background-color: #F9FAFB; }
+    .num-col { text-align: center; font-weight: 700; }
+
+    /* Acordeón */
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .accordion-item {
+      border: 1px solid var(--inegi-gray-border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #FFF;
+    }
+
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      background: #F9FAFB;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+
+    .accordion-header:hover { background-color: #F3F4F6; }
+
+    .accordion-title {
+      font-weight: 700;
+      color: var(--inegi-blue);
+      font-size: 15px;
+    }
+
+    .accordion-meta {
+      font-size: 12px;
+      color: var(--inegi-text-muted);
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      color: #FFF;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .accordion-body {
+      display: none;
+      padding: 16px;
+      border-top: 1px solid var(--inegi-gray-border);
+      background-color: #FFF;
+    }
+
+    .accordion-item.open .accordion-body { display: block; }
+
+    .activity-card {
+      background: #F9FAFB;
+      border: 1px solid var(--inegi-gray-border);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .obs-box {
+      background: #FFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--inegi-text-main);
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .filters-grid { grid-template-columns: 1fr; }
+      .chart-row { grid-template-columns: 1fr; }
+      header { padding: 16px; }
+      .container { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="top-bar">
+      <div>
+        <div class="brand-title">
+          
+          <h1>EIC 2025 · Tablero Ejecutivo DGOR</h1>
+        </div>
+        <div class="sub-title">Muestra de recolección de insumos | Control de Estatus, Actividades y Seguimiento</div>
+      </div>
+      <button class="reload-btn" id="reloadButton" type="button">
+        <span>↻ Actualizar datos</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Filtros de Control -->
+    <section class="panel">
+      <div class="filters-grid">
+        <div class="filter-control">
+          <label>Búsqueda General</label>
+          <input id="search" placeholder="Folio, estado, responsable o acceso...">
+        </div>
+        <div class="filter-control">
+          <label>Estatus</label>
+          <select id="estatusFilter"><option>Todos</option></select>
+        </div>
+        <div class="filter-control">
+          <label>Situación</label>
+          <select id="situacionFilter"><option>Todos</option></select>
+        </div>
+        <div class="filter-control">
+          <label>Entidad / Estado</label>
+          <select id="estadoFilter"><option>Todos</option></select>
+        </div>
+      </div>
+      <div id="fileInfo" class="file-info">Cargando el Excel desde el repositorio...</div>
+    </section>
+
+    <!-- Navegación por pestañas -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-view="inicio">Vista General</button>
+      <button class="nav-tab" data-view="folio">Actividades por Folio</button>
+      <button class="nav-tab" data-view="estatus">Estatus y Seguimiento</button>
+      <button class="nav-tab" data-view="situacion">Resumen de Situación</button>
+      <button class="nav-tab" data-view="detalle">Tabla Detalle</button>
+    </nav>
+
+    <!-- VISTA: INICIO -->
+    <section id="view-inicio">
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-total">
+          <div class="kpi-title">Total de Folios</div>
+          <div class="kpi-value" id="kpiTotal">0</div>
+        </div>
+        <div class="kpi-card kpi-nra">
+          <div class="kpi-title">No requiere atención</div>
+          <div class="kpi-value" id="kpiNRA">0</div>
+        </div>
+        <div class="kpi-card kpi-asignado">
+          <div class="kpi-title">Asignado</div>
+          <div class="kpi-value" id="kpiAsignado">0</div>
+        </div>
+        <div class="kpi-card kpi-concretado">
+          <div class="kpi-title">Concretado</div>
+          <div class="kpi-value" id="kpiConcretado">0</div>
+        </div>
+        <div class="kpi-card kpi-proceso">
+          <div class="kpi-title">En Proceso</div>
+          <div class="kpi-value" id="kpiProceso">0</div>
+        </div>
+        <div class="kpi-card kpi-noasignado">
+          <div class="kpi-title">No Asignado</div>
+          <div class="kpi-value" id="kpiNoAsignado">0</div>
+        </div>
+        <div class="kpi-card kpi-noconcretado">
+          <div class="kpi-title">No Concretado</div>
+          <div class="kpi-value" id="kpiNoConcretado">0</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Estatus por Entidad Federativa</div>
+        <div id="estadoChart"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Mapa de Calor (Estado × Estatus)</div>
+        <div id="heatmap"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Distribución por Situación Registrada</div>
+        <div id="situacionChart"></div>
+      </div>
+    </section>
+
+    <!-- VISTA: FOLIO -->
+    <section id="view-folio" class="hidden">
+      <div class="panel">
+        <div class="panel-title">Actividades Realizadas por Folio</div>
+        <div id="accordion" class="accordion"></div>
+      </div>
+    </section>
+
+    <!-- VISTA: ESTATUS -->
+    <section id="view-estatus" class="hidden">
+      <div class="panel">
+        <div class="panel-title">Historial de Estatus y Seguimiento</div>
+        <div id="estatusAccordion" class="accordion"></div>
+      </div>
+    </section>
+
+    <!-- VISTA: SITUACION -->
+    <section id="view-situacion" class="hidden">
+      <div class="panel">
+        <div class="panel-title">Resumen de Situación de los Insumos</div>
+        <div id="situacionTable" class="table-container"></div>
+      </div>
+    </section>
+
+    <!-- VISTA: DETALLE -->
+    <section id="view-detalle" class="hidden">
+      <div class="panel">
+        <div class="panel-title">Detalle General Filtrado</div>
+        <div id="detailTable" class="table-container"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const STATUS = ['NO REQUIERE ATENCION','ASIGNADO','CONCRETADO','EN PROCESO','NO ASIGNADO','NO CONCRETADO'];
+    const COLORS = {
+      'NO REQUIERE ATENCION': '#6B7280',
+      'ASIGNADO': '#D97706',
+      'CONCRETADO': '#15803D',
+      'EN PROCESO': '#1D4ED8',
+      'NO ASIGNADO': '#DC2626',
+      'NO CONCRETADO': '#991B1B'
+    };
+
+    let accessRows = [], activityRows = [], statusRows = [];
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    const clean = s => String(s ?? '').trim();
+    const strip = s => clean(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    function keyVal(o, names) {
+      if (!o) return '';
+      const keys = Object.keys(o);
+      for (const name of names) {
+        const target = strip(name);
+        const k = keys.find(x => strip(x) === target || strip(x).includes(target));
+        if (k !== undefined) return o[k];
+      }
+      return '';
+    }
+
+    function normalize(rows) {
+      return rows.map(r => ({
+        UE: clean(keyVal(r, ['UE','Dirección Regional'])),
+        CE: clean(keyVal(r, ['CE','Estado','Entidad','Coordinación'])),
+        Folio: clean(keyVal(r, ['Folio'])),
+        Estatus: clean(keyVal(r, ['Estatus actual','Estatus'])).toUpperCase() || 'SIN ESTATUS',
+        Nombre: clean(keyVal(r, ['Nombre del acceso','Nombre'])),
+        Responsable: clean(keyVal(r, ['Empleado asignado','Responsable'])),
+        Actividad: clean(keyVal(r, ['Actividad'])) || 'SIN REGISTRO',
+        Situacion: clean(keyVal(r, ['Situación','Situacion'])) || 'SIN SITUACION',
+        Detalle: clean(keyVal(r, ['Detalle de la situación','Detalle'])),
+        Observaciones: clean(keyVal(r, ['Observaciones de la acción'])),
+        Motivo: clean(keyVal(r, ['Motivo del estatus','Motivo'])),
+        ObsEstatus: clean(keyVal(r, ['Observaciones del estatus','Observaciones'])),
+        Fecha: clean(keyVal(r, ['Fecha actividad','Fecha']))
+      })).filter(x => x.Folio || x.Nombre);
+    }
+
+    const uniq = a => [...new Set(a.filter(Boolean))].sort((a,b) => String(a).localeCompare(String(b), 'es', {numeric:true}));
+
+    function parseDate(v) {
+      if (v instanceof Date) return v;
+      const s = clean(v);
+      let m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+      if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+      let d = new Date(s);
+      return isNaN(d) ? new Date(0) : d;
+    }
+
+    function latestByFolio(rows) {
+      const m = {};
+      rows.forEach((x, i) => {
+        if (!x.Folio) return;
+        const t = parseDate(x.Fecha).getTime();
+        if (!m[x.Folio] || t > m[x.Folio].t || (t === m[x.Folio].t && i > m[x.Folio].i)) {
+          m[x.Folio] = {x, t, i};
+        }
+      });
+      return Object.values(m).map(v => v.x);
+    }
+
+    function uniqueFolioRows(rows) {
+      const m = new Map();
+      rows.forEach(x => { if (x.Folio && !m.has(x.Folio)) m.set(x.Folio, x); });
+      return [...m.values()];
+    }
+
+    function options(id, vals, fixed = false) {
+      const e = document.getElementById(id);
+      const cur = e.value;
+      const arr = fixed ? vals : uniq(vals);
+      e.innerHTML = '<option>Todos</option>' + arr.map(v => `<option>${esc(v)}</option>`).join('');
+      if (cur === 'Todos' || arr.includes(cur)) e.value = cur;
+    }
+
+    function matchCommon(x) {
+      const q = strip(document.getElementById('search').value);
+      const c = document.getElementById('estadoFilter').value;
+      const matchSearch = !q || strip([x.Folio, x.Nombre, x.CE, x.UE, x.Responsable].join(' ')).includes(q);
+      const matchEstado = (c === 'Todos' || x.CE === c);
+      return matchSearch && matchEstado;
+    }
+
+    function filteredAccess() {
+      const e = document.getElementById('estatusFilter').value;
+      return uniqueFolioRows(accessRows).filter(x => matchCommon(x) && (e === 'Todos' || x.Estatus === e));
+    }
+
+    function filteredActivity() {
+      const s = document.getElementById('situacionFilter').value;
+      return activityRows.filter(x => matchCommon(x) && (s === 'Todos' || x.Situacion === s));
+    }
+
+    function filteredStatus() {
+      const e = document.getElementById('estatusFilter').value;
+      return statusRows.filter(x => matchCommon(x) && (e === 'Todos' || x.Estatus === e));
+    }
+
+    function render() {
+      options('estatusFilter', STATUS, true);
+      options('situacionFilter', activityRows.map(x => x.Situacion));
+      options('estadoFilter', [...accessRows, ...activityRows, ...statusRows].map(x => x.CE));
+
+      const ar = filteredAccess();
+      const act = filteredActivity();
+      const sr = filteredStatus();
+
+      renderKpis(ar);
+      renderEstado(ar);
+      renderHeat(ar);
+      renderSituacion(act);
+      renderAcc(act);
+      renderStatus(sr);
+      renderTables(act);
+    }
+
+    function renderKpis(r) {
+      const c = s => r.filter(x => x.Estatus === s).length;
+      document.getElementById('kpiTotal').textContent = r.length;
+      document.getElementById('kpiNRA').textContent = c(STATUS[0]);
+      document.getElementById('kpiAsignado').textContent = c(STATUS[1]);
+      document.getElementById('kpiConcretado').textContent = c(STATUS[2]);
+      document.getElementById('kpiProceso').textContent = c(STATUS[3]);
+      document.getElementById('kpiNoAsignado').textContent = c(STATUS[4]);
+      document.getElementById('kpiNoConcretado').textContent = c(STATUS[5]);
+    }
+
+    function estado(r) {
+      const m = {};
+      uniq(r.map(x => x.CE || 'SIN ESTADO')).forEach(e => m[e] = {estado: e, counts: Object.fromEntries(STATUS.map(s => [s, 0]))});
+      r.forEach(x => {
+        const e = x.CE || 'SIN ESTADO';
+        if (!m[e]) m[e] = {estado: e, counts: Object.fromEntries(STATUS.map(s => [s, 0]))};
+        if (STATUS.includes(x.Estatus)) m[e].counts[x.Estatus]++;
+      });
+      return Object.values(m).sort((a,b) => a.estado.localeCompare(b.estado, 'es'));
+    }
+
+    function renderEstado(r) {
+      const d = estado(r);
+      const max = Math.max(1, ...d.map(x => STATUS.reduce((n, s) => n + x.counts[s], 0)));
+      
+      document.getElementById('estadoChart').innerHTML = '<div class="charts-list">' + d.map(x => {
+        const total = STATUS.reduce((n, s) => n + x.counts[s], 0);
+        return `<div class="chart-row">
+          <div class="chart-label">${esc(x.estado)} <span style="color:var(--inegi-text-muted); font-weight:normal;">(${total})</span></div>
+          <div class="bar-container">
+            ${STATUS.map(s => {
+              const v = x.counts[s];
+              return v > 0 ? `<div class="bar-segment" title="${esc(s)}: ${v}" style="width:${(v/max)*100}%; background:${COLORS[s]}">${v}</div>` : '';
+            }).join('')}
+          </div>
+        </div>`;
+      }).join('') + '</div>' +
+      '<div class="legend">' + STATUS.map(s => `<div class="legend-item"><i class="dot" style="background:${COLORS[s]}"></i><span>${esc(s)}</span></div>`).join('') + '</div>';
+    }
+
+    function renderHeat(r) {
+      const container = document.getElementById('heatmap');
+      const es = uniq(r.map(x => x.CE || 'SIN ESTADO'));
+
+      if (!es.length) {
+        container.innerHTML = '<div class="file-info">Sin información para generar el mapa Estado × Estatus.</div>';
+        return;
+      }
+
+      const counts = es.flatMap(e =>
+        STATUS.map(s => r.filter(x => (x.CE || 'SIN ESTADO') === e && x.Estatus === s).length)
+      );
+      const max = Math.max(1, ...counts);
+
+      container.innerHTML = '<div class="table-container"><table><thead><tr><th>Entidad Federativa</th>' +
+        STATUS.map(s => `<th>${esc(s)}</th>`).join('') + '<th>Total</th></tr></thead><tbody>' +
+        es.map(e => {
+          const vals = STATUS.map(s => r.filter(x => (x.CE || 'SIN ESTADO') === e && x.Estatus === s).length);
+          const total = vals.reduce((a, b) => a + b, 0);
+          return '<tr><td>' + esc(e) + '</td>' +
+            vals.map(v => `<td class="num-col" style="background:rgba(0,51,102,${(v/max) * 0.25})">${v}</td>`).join('') +
+            `<td class="num-col"><b>${total}</b></td></tr>`;
+        }).join('') + '</tbody></table></div>';
+    }
+
+    function renderSituacion(r) {
+      const latest = latestByFolio(r);
+      const m = {};
+      latest.forEach(x => m[x.Situacion || 'SIN SITUACION'] = (m[x.Situacion || 'SIN SITUACION'] || 0) + 1);
+      const d = Object.entries(m).sort((a,b) => b[1] - a[1]);
+      const max = Math.max(1, ...d.map(x => x[1]));
+
+      document.getElementById('situacionChart').innerHTML = '<div class="charts-list">' + d.map(([k, v]) => {
+        return `<div class="chart-row">
+          <div class="chart-label">${esc(k)}</div>
+          <div class="bar-container">
+            <div class="bar-segment" style="width:${(v/max)*100}%; background:var(--inegi-blue); justify-content: flex-end; padding-right: 8px;">${v}</div>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    function group(a, k) {
+      return a.reduce((m, x) => ((m[x[k] || 'SIN DATO'] ??= []).push(x), m), {});
+    }
+
+    function card(folio, f, meta, body) {
+      return `<div class="accordion-item">
+        <div class="accordion-header" onclick="this.parentNode.classList.toggle('open')">
+          <div>
+            <div class="accordion-title">Folio ${esc(folio)} — ${esc(f.Nombre)}</div>
+            <div class="accordion-meta">${esc(f.CE)} · ${esc(meta)}</div>
+          </div>
+          <span class="status-badge" style="background:${COLORS[f.Estatus] || '#6B7280'}">${esc(f.Estatus)}</span>
+        </div>
+        <div class="accordion-body">${body}</div>
+      </div>`;
+    }
+
+    function renderAcc(r) {
+      document.getElementById('accordion').innerHTML = Object.entries(group(r, 'Folio'))
+        .sort((a,b) => a[0].localeCompare(b[0], 'es', {numeric:true}))
+        .map(([f, it]) => card(f, it[0], it.length + ' actividad(es)', it.map(x => `
+          <div class="activity-card">
+            <div class="activity-grid">
+              <div><b>Actividad:</b> ${esc(x.Actividad)}</div>
+              <div><b>Situación:</b> ${esc(x.Situacion)}</div>
+              <div><b>Responsable:</b> ${esc(x.Responsable || 'Sin asignar')}</div>
+              <div><b>Fecha:</b> ${esc(x.Fecha || 'Sin fecha')}</div>
+            </div>
+            <div class="obs-box"><b>Detalle:</b> ${esc(x.Detalle || 'Sin detalle')}</div>
+            <div class="obs-box"><b>Observaciones:</b> ${esc(x.Observaciones || 'Sin observaciones')}</div>
+          </div>`).join(''))).join('');
+    }
+
+    function renderStatus(r) {
+      document.getElementById('estatusAccordion').innerHTML = Object.entries(group(r, 'Folio'))
+        .sort((a,b) => a[0].localeCompare(b[0], 'es', {numeric:true}))
+        .map(([f, it]) => card(f, it[0], it.length + ' seguimiento(s)', it.map(x => `
+          <div class="activity-card">
+            <div class="activity-grid">
+              <div><b>Estatus:</b> ${esc(x.Estatus)}</div>
+              <div><b>Empleado:</b> ${esc(x.Responsable || 'Sin asignar')}</div>
+              <div><b>Fecha:</b> ${esc(x.Fecha || 'Sin fecha')}</div>
+            </div>
+            <div class="obs-box"><b>Motivo:</b> ${esc(x.Motivo || 'Sin motivo')}</div>
+            <div class="obs-box"><b>Observaciones:</b> ${esc(x.ObsEstatus || 'Sin observaciones')}</div>
+          </div>`).join(''))).join('');
+    }
+
+    function renderTables(r) {
+      const latest = latestByFolio(r);
+      const m = {};
+      latest.forEach(x => m[x.Situacion || 'SIN SITUACION'] = (m[x.Situacion || 'SIN SITUACION'] || 0) + 1);
+
+      document.getElementById('situacionTable').innerHTML = '<table><thead><tr><th>Situación</th><th>Total de Registros</th></tr></thead><tbody>' + 
+        Object.entries(m).sort((a,b) => b[1] - a[1]).map(([k,v]) => `<tr><td>${esc(k)}</td><td class="num-col">${v}</td></tr>`).join('') + 
+        '</tbody></table>';
+
+      document.getElementById('detailTable').innerHTML = '<table><thead><tr><th>Folio</th><th>Estado</th><th>Nombre del Acceso</th><th>Estatus</th><th>Responsable</th><th>Fecha</th></tr></thead><tbody>' + 
+        latest.map(x => `<tr><td><b>${esc(x.Folio)}</b></td><td>${esc(x.CE)}</td><td>${esc(x.Nombre)}</td><td><span class="status-badge" style="background:${COLORS[x.Estatus] || '#6B7280'}">${esc(x.Estatus)}</span></td><td>${esc(x.Responsable)}</td><td>${esc(x.Fecha)}</td></tr>`).join('') + 
+        '</tbody></table>';
+    }
+
+    // Tabs
+    document.querySelectorAll('.nav-tab').forEach(b => b.onclick = () => {
+      document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      document.querySelectorAll('section[id^="view-"]').forEach(x => x.classList.add('hidden'));
+      document.getElementById('view-' + b.dataset.view).classList.remove('hidden');
+    });
+
+    // Cargar Excel automáticamente desde el repositorio
+    async function loadExcelFromRepository() {
+      const fileInfo = document.getElementById('fileInfo');
+      const reloadButton = document.getElementById('reloadButton');
+
+      try {
+        if (!window.DASHBOARD_CONFIG || !window.DASHBOARD_CONFIG.excelUrl) {
+          throw new Error('No se configuró excelUrl en config.js');
+        }
+
+        reloadButton.disabled = true;
+        reloadButton.innerHTML = '<span>↻ Actualizando...</span>';
+        fileInfo.textContent = 'Cargando el Excel desde el repositorio...';
+
+        const configuredUrl = window.DASHBOARD_CONFIG.excelUrl;
+        const separator = configuredUrl.includes('?') ? '&' : '?';
+        const response = await fetch(
+          configuredUrl + separator + '_=' + Date.now(),
+          { cache: 'no-store' }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP ${response.status}`);
+        }
+
+        const buffer = await response.arrayBuffer();
+        if (buffer.byteLength < 4) {
+          throw new Error('El archivo descargado está vacío');
+        }
+
+        const signature = new Uint8Array(buffer.slice(0, 2));
+        if (signature[0] !== 0x50 || signature[1] !== 0x4B) {
+          throw new Error('El archivo descargado no es un XLSX válido');
+        }
+
+        const wb = XLSX.read(buffer, { type: 'array', cellDates: true });
+        const read = n => wb.Sheets[n]
+          ? normalize(XLSX.utils.sheet_to_json(
+              wb.Sheets[n],
+              { defval: '', raw: false, dateNF: 'dd/mm/yyyy' }
+            ))
+          : [];
+
+        accessRows = read('Accesos');
+        activityRows = read('Actividades');
+        statusRows = read('Estatus');
+
+        // Compatibilidad con el Excel anterior.
+        if (!accessRows.length) {
+          if (statusRows.length) {
+            accessRows = latestByFolio(statusRows);
+          } else if (activityRows.length) {
+            accessRows = uniqueFolioRows(activityRows);
+          }
+        }
+
+        if (!statusRows.length && accessRows.length) {
+          statusRows = accessRows.slice();
+        }
+
+        if (!accessRows.length && !activityRows.length && !statusRows.length) {
+          throw new Error('El Excel no contiene registros reconocibles');
+        }
+
+        fileInfo.textContent =
+          `Excel actualizado · Hojas: ${wb.SheetNames.join(', ')} · ` +
+          `Folios: ${uniqueFolioRows(accessRows).length} · ` +
+          `Actividades: ${activityRows.length} · ` +
+          `Seguimientos: ${statusRows.length} · ` +
+          `${new Date().toLocaleString('es-MX')}`;
+
+        render();
+      } catch (err) {
+        console.error(err);
+        accessRows = [];
+        activityRows = [];
+        statusRows = [];
+        render();
+        fileInfo.textContent = 'No se pudo cargar el Excel: ' + err.message;
+      } finally {
+        reloadButton.disabled = false;
+        reloadButton.innerHTML = '<span>↻ Actualizar datos</span>';
+      }
+    }
+
+    ['search', 'estatusFilter', 'situacionFilter', 'estadoFilter'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', render);
+      el.addEventListener('change', render);
+    });
+
+    document.getElementById('reloadButton').addEventListener('click', loadExcelFromRepository);
+    window.addEventListener('DOMContentLoaded', loadExcelFromRepository);
+  </script>
+</body>
+</html>
